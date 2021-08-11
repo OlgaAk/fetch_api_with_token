@@ -20,10 +20,13 @@ const fetchData = (token) => {
     })
     .then((data) => {
       if (data) {
+        if (!globalData) data = globalData;
         if (JSON.stringify(data) === JSON.stringify(globalData)) {
           postMessage({ status: "unchanged" });
         } else {
           postMessage({ status: "changed", payload: data });
+
+          globalData = data;
         }
       }
     });
