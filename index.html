@@ -16,7 +16,7 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-xs 12">
+        <div class="col-12">
           <h3>Get new info</h3>
           <div class="input-group mb-3">
             <input
@@ -58,20 +58,55 @@
             Authorization: "Bearer " + token,
           }),
         })
-          .then((response) => response.json())
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              document.getElementById("content-box").innerHTML =
+                response.statusText;
+            }
+          })
           .then((data) => {
-            console.log(data);
-            document.getElementById("content-box").innerHTML = ""
-            data.items.forEach((element) => {
-              let p = document.createElement("p");
-              p.innerText = JSON.stringify(element);
-              document.getElementById("content-box").appendChild(p);
-            });
+            if (data) {
+              console.log(data);
+              document.getElementById("content-box").innerHTML = "";
+              data.items.forEach((element) => {
+                let outerdiv = document.createElement("div");
+                outerdiv.style.marginBottom = "10px";
+                outerdiv.style.marginTop = "5px";
+                outerdiv.classList.add("card");
+                let div = document.createElement("div");
+                div.classList.add("card-body");
+                for (const property in element) {
+                  let p = document.createElement("p");
+                  p.style.margin = 0;
+                  p.style.fontSize = "0.9em";
+                  if (property === "lastActivity") {
+                    let date = new Date(element[property]);
+                    date = date.toLocaleString("ru-ru");
+                    p.innerHTML =
+                      "<b>" +
+                      property +
+                      "</b>: " +
+                      "<span style='color:red'>" +
+                      date +
+                      "</span>";
+                  } else {
+                    p.innerHTML =
+                      "<b>" + property + "</b>: " + element[property];
+                  }
+
+                  div.appendChild(p);
+                }
+                outerdiv.appendChild(div);
+                document.getElementById("content-box").appendChild(outerdiv);
+              });
+            }
           })
-          .catch((error)=>{
-              console.log("error "+error)
-            document.getElementById("content-box").innerHTML = error.message
-          })
+          .catch((error) => {
+            console.log("error " + error);
+            document.getElementById("content-box").innerHTML = error.message;
+          });
       };
       // 'lastActivity":"[^"]*"'
       document
