@@ -2,7 +2,7 @@ let globalToken = null;
 let globalData = null;
 
 onmessage = function (e) {
-  globalToken = e.data;
+  if (e.data.type === "token") globalToken = e.data.value;
 };
 
 const fetchData = (token) => {

@@ -5,7 +5,7 @@ function startWorker() {
     if (typeof w == "undefined") {
       w = new Worker("./worker.js");
     }
-    w.postMessage(getToken());
+    w.postMessage({ type: "token", value: getToken() });
     w.onmessage = function (event) {
       console.log(event.data);
       if (event.data.status == "changed") {
