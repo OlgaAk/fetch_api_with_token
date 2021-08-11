@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-xs 12">
+          <h3>Get new info</h3>
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="url"
+              aria-label="url"
+              aria-describedby="basic-addon1"
+            />
+          </div>
+          <div class="input-group mb-3">
+            <input
+              id="token"
+              type="text"
+              class="form-control"
+              placeholder="token"
+              aria-label="token"
+              aria-describedby="basic-addon1"
+            />
+          </div>
+          <button id="fetch-button" class="btn btn-primary">Fetch</button>
+          <span id="content-box"></span>
+        </div>
+      </div>
+    </div>
+    <script>
+      const fetchInfo = () => {
+        const token = document.getElementById("token").value;
+        console.log(token)
+        fetch("https://webexapis.com/v1/rooms", {
+          headers: new Headers({
+            Authorization: "Bearer "+ token,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            data.items.forEach(element => {
+                let p = document.createElement("p");
+                p.innerText = JSON.stringify(element)
+                document.getElementById("content-box").appendChild(p)
+            });
+           
+          });
+      };
+      // 'lastActivity":"[^"]*"'
+      document
+        .getElementById("fetch-button")
+        .addEventListener("click", fetchInfo);
+    </script>
+  </body>
+</html>
