@@ -13,8 +13,7 @@ function startWorker() {
         updateUI(event.data.payload);
       } else if (event.data.status == "unchanged") {
         document.getElementById("update-time").innerText =
-          new Date().toLocaleString;
-        +" No changes";
+          new Date().toLocaleString + " No changes";
       }
     };
   } else {
@@ -105,7 +104,6 @@ const updateUI = (data) => {
     outerdiv.appendChild(div);
     document.getElementById("content-box").appendChild(outerdiv);
     document.getElementById("update-time").innerText =
-      new Date().toLocaleString;
-    +" Changes available!";
+      new Date().toLocaleString + " Changes available!";
   });
 };
