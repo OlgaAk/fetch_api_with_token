@@ -9,7 +9,7 @@ function startWorker() {
     w.onmessage = function (event) {
       console.log(event.data);
       if (event.data.status == "changed") {
-        updateUI(event.data.payload);
+        updateUI(event.data.payload, " Changes available!");
         stopWorker();
         fetch(
           "https://api.telegram.org/bot1908404357:AAGU4nWhoOzUZxdbwg3mU9T1qiEYGWmLwqg/sendmessage?chat_id=377527849&text=changes%%20on%20webex%!"
@@ -74,7 +74,7 @@ const fetchInfo = () => {
 // 'lastActivity":"[^"]*"'
 document.getElementById("fetch-button").addEventListener("click", fetchInfo);
 
-const updateUI = (data) => {
+const updateUI = (data, changesStatus) => {
   console.log(data);
   document.getElementById("content-box").innerHTML = "";
   data.items.forEach((element) => {
@@ -107,6 +107,7 @@ const updateUI = (data) => {
     outerdiv.appendChild(div);
     document.getElementById("content-box").appendChild(outerdiv);
     document.getElementById("update-time").innerText =
-      new Date().toLocaleString("ru-ru") + " Changes available!";
+      new Date().toLocaleString("ru-ru") +
+      (changesStatus != undefined ? changesStatus : "");
   });
 };
