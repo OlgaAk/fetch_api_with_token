@@ -2,7 +2,7 @@ const globalToken = null;
 const globalData = null;
 
 onmessage = function (e) {
-  token = e.data;
+  globalToken = e.data;
 };
 
 const fetchData = (token) => {
