@@ -44,23 +44,34 @@
     </div>
     <script>
       const fetchInfo = () => {
-        const token = document.getElementById("token").value;
-        console.log(token)
+        let token = document.getElementById("token").value;
+        if (!token) {
+          let savedToken = localStorage.getItem("fetch-app-token");
+          if (savedToken) token = savedToken;
+        } else {
+          localStorage.setItem("fetch-app-token", token);
+        }
+
+        console.log(token);
         fetch("https://webexapis.com/v1/rooms", {
           headers: new Headers({
-            Authorization: "Bearer "+ token,
+            Authorization: "Bearer " + token,
           }),
         })
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-            data.items.forEach(element => {
-                let p = document.createElement("p");
-                p.innerText = JSON.stringify(element)
-                document.getElementById("content-box").appendChild(p)
+            document.getElementById("content-box").innerHTML = ""
+            data.items.forEach((element) => {
+              let p = document.createElement("p");
+              p.innerText = JSON.stringify(element);
+              document.getElementById("content-box").appendChild(p);
             });
-           
-          });
+          })
+          .catch((error)=>{
+              console.log("error "+error)
+            document.getElementById("content-box").innerHTML = error.message
+          })
       };
       // 'lastActivity":"[^"]*"'
       document
