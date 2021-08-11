@@ -5,8 +5,13 @@ function startWorker() {
     if (typeof w == "undefined") {
       w = new Worker("./worker.js");
     }
+    w.postMessage(getToken());
     w.onmessage = function (event) {
-      alert(event.data);
+      console.log(event.data);
+      if (event.data.status == "changed") {
+        alert("data has changed!");
+        updateUI(event.data.payload);
+      }
     };
   } else {
     alert("Sorry! No Web Worker support.");
@@ -25,16 +30,19 @@ document
   .getElementById("unsubscribe-button")
   .addEventListener("click", stopWorker);
 
-const fetchInfo = () => {
-  let token = document.getElementById("token").value;
-  if (!token) {
+const getToken = () => {
+  let input = document.getElementById("token").value;
+  if (!input) {
     let savedToken = localStorage.getItem("fetch-app-token");
-    if (savedToken) token = savedToken;
+    if (savedToken) return savedToken;
   } else {
     localStorage.setItem("fetch-app-token", token);
   }
+  return input;
+};
 
-  console.log(token);
+const fetchInfo = () => {
+  const token = getToken();
   fetch("https://webexapis.com/v1/rooms", {
     headers: new Headers({
       Authorization: "Bearer " + token,
@@ -49,38 +57,7 @@ const fetchInfo = () => {
     })
     .then((data) => {
       if (data) {
-        console.log(data);
-        document.getElementById("content-box").innerHTML = "";
-        data.items.forEach((element) => {
-          let outerdiv = document.createElement("div");
-          outerdiv.style.marginBottom = "10px";
-          outerdiv.style.marginTop = "5px";
-          outerdiv.classList.add("card");
-          let div = document.createElement("div");
-          div.classList.add("card-body");
-          for (const property in element) {
-            let p = document.createElement("p");
-            p.style.margin = 0;
-            p.style.fontSize = "0.9em";
-            if (property === "lastActivity") {
-              let date = new Date(element[property]);
-              date = date.toLocaleString("ru-ru");
-              p.innerHTML =
-                "<b>" +
-                property +
-                "</b>: " +
-                "<span style='color:red'>" +
-                date +
-                "</span>";
-            } else {
-              p.innerHTML = "<b>" + property + "</b>: " + element[property];
-            }
-
-            div.appendChild(p);
-          }
-          outerdiv.appendChild(div);
-          document.getElementById("content-box").appendChild(outerdiv);
-        });
+        updateUI(data);
       }
     })
     .catch((error) => {
@@ -90,3 +67,38 @@ const fetchInfo = () => {
 };
 // 'lastActivity":"[^"]*"'
 document.getElementById("fetch-button").addEventListener("click", fetchInfo);
+
+const updateUI = (data) => {
+  console.log(data);
+  document.getElementById("content-box").innerHTML = "";
+  data.items.forEach((element) => {
+    let outerdiv = document.createElement("div");
+    outerdiv.style.marginBottom = "10px";
+    outerdiv.style.marginTop = "5px";
+    outerdiv.classList.add("card");
+    let div = document.createElement("div");
+    div.classList.add("card-body");
+    for (const property in element) {
+      let p = document.createElement("p");
+      p.style.margin = 0;
+      p.style.fontSize = "0.9em";
+      if (property === "lastActivity") {
+        let date = new Date(element[property]);
+        date = date.toLocaleString("ru-ru");
+        p.innerHTML =
+          "<b>" +
+          property +
+          "</b>: " +
+          "<span style='color:red'>" +
+          date +
+          "</span>";
+      } else {
+        p.innerHTML = "<b>" + property + "</b>: " + element[property];
+      }
+
+      div.appendChild(p);
+    }
+    outerdiv.appendChild(div);
+    document.getElementById("content-box").appendChild(outerdiv);
+  });
+};
