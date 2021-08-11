@@ -38,7 +38,7 @@ function timedCount() {
     postMessage({ status: "notoken" });
   }
 
-  setTimeout("timedCount()", 1000 * 4);
+  setTimeout("timedCount()", 1000 * 60 * 10);
 }
 
 timedCount();
