@@ -38,80 +38,17 @@
             />
           </div>
           <button id="fetch-button" class="btn btn-primary">Fetch</button>
+          <button id="subscribe-button" class="btn btn-warning">
+            Subscribe to changes
+          </button>
+          <button id="unsubscribe-button" class="btn btn-secondary">
+            Unsubscribe
+          </button>
           <span id="content-box"></span>
         </div>
       </div>
     </div>
-    <script>
-      const fetchInfo = () => {
-        let token = document.getElementById("token").value;
-        if (!token) {
-          let savedToken = localStorage.getItem("fetch-app-token");
-          if (savedToken) token = savedToken;
-        } else {
-          localStorage.setItem("fetch-app-token", token);
-        }
-
-        console.log(token);
-        fetch("https://webexapis.com/v1/rooms", {
-          headers: new Headers({
-            Authorization: "Bearer " + token,
-          }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            } else {
-              document.getElementById("content-box").innerHTML =
-                response.statusText;
-            }
-          })
-          .then((data) => {
-            if (data) {
-              console.log(data);
-              document.getElementById("content-box").innerHTML = "";
-              data.items.forEach((element) => {
-                let outerdiv = document.createElement("div");
-                outerdiv.style.marginBottom = "10px";
-                outerdiv.style.marginTop = "5px";
-                outerdiv.classList.add("card");
-                let div = document.createElement("div");
-                div.classList.add("card-body");
-                for (const property in element) {
-                  let p = document.createElement("p");
-                  p.style.margin = 0;
-                  p.style.fontSize = "0.9em";
-                  if (property === "lastActivity") {
-                    let date = new Date(element[property]);
-                    date = date.toLocaleString("ru-ru");
-                    p.innerHTML =
-                      "<b>" +
-                      property +
-                      "</b>: " +
-                      "<span style='color:red'>" +
-                      date +
-                      "</span>";
-                  } else {
-                    p.innerHTML =
-                      "<b>" + property + "</b>: " + element[property];
-                  }
-
-                  div.appendChild(p);
-                }
-                outerdiv.appendChild(div);
-                document.getElementById("content-box").appendChild(outerdiv);
-              });
-            }
-          })
-          .catch((error) => {
-            console.log("error " + error);
-            document.getElementById("content-box").innerHTML = error.message;
-          });
-      };
-      // 'lastActivity":"[^"]*"'
-      document
-        .getElementById("fetch-button")
-        .addEventListener("click", fetchInfo);
-    </script>
+    <script src="script.js"></script>
+    <script src="worker.js"></script>
   </body>
 </html>
