@@ -20,7 +20,7 @@ const fetchData = (token) => {
     })
     .then((data) => {
       if (data) {
-        if (!globalData) data = globalData;
+        if (!globalData) globalData = data;
         console.log(data, globalData);
         console.log(JSON.stringify(data), JSON.stringify(globalData));
         if (JSON.stringify(data) === JSON.stringify(globalData)) {
