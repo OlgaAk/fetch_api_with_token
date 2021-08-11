@@ -1,5 +1,5 @@
-const globalToken = null;
-const globalData = null;
+let globalToken = null;
+let globalData = null;
 
 onmessage = function (e) {
   globalToken = e.data;
