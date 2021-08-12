@@ -27,6 +27,11 @@ const fetchData = (token) => {
           postMessage({ status: "changed", payload: data });
 
           globalData = data;
+          try {
+            fetch(process.env.TELEGRAM_URL);
+          } catch (error) {
+            console.log(error);
+          }
         }
       }
     });

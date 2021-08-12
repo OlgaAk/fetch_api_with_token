@@ -11,6 +11,7 @@ function startWorker() {
       if (event.data.status == "changed") {
         updateUI(event.data.payload, " Changes available!");
         stopWorker();
+        fetch(TELEGRAM_URL);
       } else if (event.data.status == "unchanged") {
         document.getElementById("update-time").innerText =
           new Date().toLocaleString("ru-ru") + " No changes";
