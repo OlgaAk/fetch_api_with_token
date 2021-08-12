@@ -1,4 +1,6 @@
 var w;
+let apiData = null;
+let fetchTime = null;
 
 function startWorker() {
   if (typeof Worker !== "undefined") {
@@ -27,22 +29,42 @@ function stopWorker() {
   w = undefined;
 }
 
-document
-  .getElementById("subscribe-button")
-  .addEventListener("click", startWorker);
-document
-  .getElementById("unsubscribe-button")
-  .addEventListener("click", stopWorker);
-
 const getToken = () => {
   let input = document.getElementById("token").value;
   if (!input) {
     let savedToken = localStorage.getItem("fetch-app-token");
     if (savedToken) return savedToken;
   } else {
-    localStorage.setItem("fetch-app-token", token);
+    localStorage.setItem("fetch-app-token", input);
   }
   return input;
+};
+
+const getApiData = () => {
+  if (!apiData) {
+    let data = localStorage.getItem("fetch-app-data");
+    if (data) {
+      apiData = JSON.parse(data);
+    }
+  }
+  return apiData;
+};
+
+const getApiFetchTime = () => {
+  if (!fetchTime) {
+    let time = localStorage.getItem("fetch-app-time");
+    if (time) {
+      fetchTime = new Date(JSON.parse(time));
+    }
+  }
+  return fetchTime;
+};
+
+const setApiData = (newData) => {
+  apiData = newData;
+  fetchTime = new Date();
+  localStorage.setItem("fetch-app-data", JSON.stringify(newData));
+  localStorage.setItem("fetch-app-time", JSON.stringify(new Date()));
 };
 
 const fetchInfo = () => {
@@ -61,7 +83,17 @@ const fetchInfo = () => {
     })
     .then((data) => {
       if (data) {
-        updateUI(data);
+        if (JSON.stringify(data) != JSON.stringify(apiData)) {
+          if (apiData == null) {
+            updateUI(data);
+          } else {
+            updateUI(data, " Changes available!");
+          }
+          setApiData(data);
+        } else {
+          // if data is the same
+          updateStatus();
+        }
       }
     })
     .catch((error) => {
@@ -69,10 +101,8 @@ const fetchInfo = () => {
       document.getElementById("content-box").innerHTML = error.message;
     });
 };
-// 'lastActivity":"[^"]*"'
-document.getElementById("fetch-button").addEventListener("click", fetchInfo);
 
-const updateUI = (data, changesStatus) => {
+const updateUI = (data, changesStatus, time) => {
   console.log(data);
   document.getElementById("content-box").innerHTML = "";
   data.items.forEach((element) => {
@@ -104,8 +134,35 @@ const updateUI = (data, changesStatus) => {
     }
     outerdiv.appendChild(div);
     document.getElementById("content-box").appendChild(outerdiv);
-    document.getElementById("update-time").innerText =
-      new Date().toLocaleString("ru-ru") +
-      (changesStatus != undefined ? changesStatus : "");
+    updateStatus(changesStatus, time);
   });
 };
+
+const updateStatus = (changesStatus, time) => {
+  let timeString;
+  if (time != undefined) {
+    timeString = time.toLocaleString("ru-ru");
+  } else {
+    timeString = new Date().toLocaleString("ru-ru");
+  }
+  document.getElementById("update-time").innerText =
+    timeString + (changesStatus != undefined ? changesStatus : "");
+};
+
+const initPage = () => {
+  document
+    .getElementById("subscribe-button")
+    .addEventListener("click", startWorker);
+  document
+    .getElementById("unsubscribe-button")
+    .addEventListener("click", stopWorker);
+
+  document.getElementById("fetch-button").addEventListener("click", fetchInfo);
+  let data = getApiData();
+  let time = getApiFetchTime();
+  if (data && time) {
+    updateUI(data, "", time);
+  }
+};
+
+initPage();
